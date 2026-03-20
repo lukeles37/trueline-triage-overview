@@ -1,893 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TrueLine · Clinical Triage Framework</title>
-<style>
-:root {
-  --teal:   #0D3D2E;
-  --teal-d: #071E15;
-  --teal-m: #155040;
-  --teal-l: #1E6652;
-  --gold:   #C8892A;
-  --gold-l: #DFA040;
-  --white:  #FFFFFF;
-  --off-w:  #F7F4EF;
-  --slate:  #4A5568;
-  --muted:  #718096;
-  --light:  #A0AEC0;
-  --bg:     #ECEAE5;
-  --border: #E0DBD5;
-}
-*,*::before,*::after { box-sizing: border-box; margin:0; padding:0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-  background: var(--bg);
-  color: var(--teal-d);
-  min-height: 100vh;
-}
-
-/* ── HEADER ───────────────────────────────────── */
-.hdr {
-  background: var(--teal-d);
-  padding: 18px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 3px solid var(--gold);
-}
-.hdr-logo { font-size:24px; font-weight:900; letter-spacing:3px; text-transform:uppercase; color:#fff; }
-.hdr-logo em { color:var(--gold); font-style:normal; }
-.hdr-sub { font-size:10px; text-transform:uppercase; letter-spacing:2.5px; color:var(--light); margin-top:3px; }
-.prov-wrap { display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
-.prov-lbl { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:var(--light); }
-.prov-toggle { display:flex; gap:3px; background:rgba(255,255,255,0.08); padding:4px; border-radius:8px; }
-.prov-btn {
-  padding:7px 16px; border:none; border-radius:5px; font-size:12px; font-weight:700;
-  letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all .15s;
-  background:transparent; color:rgba(255,255,255,0.5);
-}
-.prov-btn.on { background:var(--gold); color:#fff; }
-.prov-btn:hover:not(.on) { color:#fff; background:rgba(255,255,255,0.12); }
-
-/* ── TABS ─────────────────────────────────────── */
-.tabs { background:var(--teal); display:flex; padding:0 32px; border-bottom:1px solid rgba(255,255,255,0.1); }
-.tab {
-  padding:14px 22px; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
-  color:rgba(255,255,255,0.5); cursor:pointer; border-bottom:3px solid transparent;
-  margin-bottom:-1px; transition:all .15s; user-select:none;
-}
-.tab:hover { color:rgba(255,255,255,0.85); }
-.tab.on { color:#fff; border-bottom-color:var(--gold); }
-
-/* ── MAIN ─────────────────────────────────────── */
-.main { padding:24px 32px; }
-.panel { display:none; }
-.panel.on { display:block; }
-
-/* ── BANNERS ──────────────────────────────────── */
-.emerg-banner {
-  background:linear-gradient(90deg,#7F1D1D,#9B2C2C);
-  color:#fff; border-radius:10px; padding:12px 20px;
-  display:flex; align-items:center; gap:14px; margin-bottom:12px;
-}
-.eb-icon { font-size:22px; flex-shrink:0; }
-.eb-title { font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:3px; }
-.eb-desc { font-size:11px; opacity:.8; line-height:1.5; }
-.entry-banner {
-  background:var(--teal-d); color:#fff; border-radius:10px;
-  padding:12px 20px; text-align:center; margin-bottom:16px;
-}
-.entry-title { font-size:13px; font-weight:800; letter-spacing:2px; text-transform:uppercase; }
-.entry-desc { font-size:11px; opacity:.65; margin-top:3px; }
-
-/* ── PILLARS GRID ─────────────────────────────── */
-.pillars-grid {
-  display:grid;
-  grid-template-columns: 1fr 52px 1fr 52px 1fr;
-  align-items:start;
-  margin-bottom:20px;
-}
-
-/* ── CONNECTOR ────────────────────────────────── */
-.connector {
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:flex-start; padding-top:72px; gap:10px;
-}
-.conn-up, .conn-dn { display:flex; flex-direction:column; align-items:center; gap:2px; }
-.conn-lbl {
-  font-size:8px; font-weight:800; letter-spacing:1px;
-  text-transform:uppercase; text-align:center; max-width:44px;
-}
-.conn-up .conn-lbl { color:var(--slate); }
-.conn-dn .conn-lbl { color:var(--light); }
-.conn-arr { font-size:20px; line-height:1; }
-.conn-up .conn-arr { color:var(--slate); }
-.conn-dn .conn-arr { color:var(--light); }
-
-/* ── PILLAR ───────────────────────────────────── */
-.pillar { border-radius:12px; overflow:hidden; box-shadow:0 2px 18px rgba(0,0,0,0.13); }
-.pillar-hdr { padding:18px 20px 15px; color:#fff; }
-.pillar-num { font-size:9px; font-weight:800; letter-spacing:2px; text-transform:uppercase; opacity:.65; margin-bottom:5px; }
-.pillar-title { font-size:20px; font-weight:900; letter-spacing:.3px; margin-bottom:4px; }
-.pillar-sub { font-size:11px; opacity:.72; font-style:italic; line-height:1.4; }
-.entry-pill {
-  display:inline-block; margin-top:9px; padding:3px 11px;
-  background:rgba(255,255,255,0.18); border-radius:20px;
-  font-size:9px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase;
-}
-.pillar-body { background:#fff; padding:10px; display:flex; flex-direction:column; gap:7px; }
-
-/* ── ROLE CARD ────────────────────────────────── */
-.rcard {
-  border-radius:8px; cursor:pointer; transition:all .18s;
-  overflow:hidden; border:2px solid transparent;
-}
-.rcard:hover { transform:translateY(-2px); box-shadow:0 5px 16px rgba(0,0,0,0.15); }
-.rcard.sel { border-color:var(--gold) !important; box-shadow:0 0 0 3px rgba(200,137,42,.22); }
-.rcard-inner { padding:11px 14px; display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-.rcard-name { font-size:13px; font-weight:800; line-height:1.3; margin-bottom:2px; }
-.rcard-tag { font-size:10px; font-style:italic; opacity:.75; line-height:1.3; }
-.rcard-badges { flex-shrink:0; display:flex; flex-direction:column; gap:3px; }
-.badge {
-  display:inline-block; padding:2px 8px; border-radius:3px;
-  font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; white-space:nowrap;
-}
-
-/* ── DETAIL PANEL ─────────────────────────────── */
-.detail { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 28px rgba(0,0,0,0.14); }
-.detail.hide { display:none; }
-.d-hdr { padding:18px 24px; display:flex; align-items:center; justify-content:space-between; color:#fff; }
-.dh-l h2 { font-size:19px; font-weight:900; }
-.dh-l p  { font-size:11px; opacity:.75; margin-top:2px; }
-.dh-r { display:flex; align-items:center; gap:14px; }
-.d-college { font-size:11px; opacity:.8; text-align:right; line-height:1.5; white-space:pre-line; }
-.d-close {
-  width:28px; height:28px; border-radius:50%; border:none;
-  background:rgba(255,255,255,.2); color:#fff; font-size:13px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-}
-.d-close:hover { background:rgba(255,255,255,.35); }
-.d-body {
-  padding:20px 24px;
-  display:grid; grid-template-columns:1fr 1fr 1fr; gap:22px;
-}
-.ds-title {
-  font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px;
-  color:var(--muted); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid #E0DBD5;
-}
-.scope-list { list-style:none; display:flex; flex-direction:column; gap:6px; }
-.scope-list li {
-  font-size:12.5px; color:var(--slate); padding-left:16px; position:relative; line-height:1.4;
-}
-.scope-list li::before { content:'▸'; position:absolute; left:0; color:var(--gold); font-size:10px; top:3px; }
-.rx-box {
-  font-size:12.5px; color:var(--slate); background:var(--off-w);
-  border-radius:6px; padding:10px 12px; line-height:1.5; margin-bottom:10px;
-}
-.rx-box.rx-full { border-left:3px solid #2F855A; }
-.rx-box.rx-del  { border-left:3px solid var(--gold); }
-.rx-box.rx-none { border-left:3px solid var(--light); }
-.cpa-box { font-size:12px; color:var(--slate); line-height:1.5; padding:9px 12px; background:#F0FAF5; border-radius:6px; border-left:3px solid var(--teal-m); }
-.pnote { margin-bottom:8px; }
-.pnote-lbl { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:3px; }
-.pnote-txt {
-  font-size:12px; color:var(--slate); padding:7px 12px;
-  border-left:3px solid var(--gold); background:#FBF8F3;
-  border-radius:0 6px 6px 0; line-height:1.5;
-}
-
-/* ── FLOW ─────────────────────────────────────── */
-.flow-wrap {
-  background:#fff; border-radius:12px; padding:24px;
-  box-shadow:0 2px 14px rgba(0,0,0,0.08); overflow-x:auto;
-}
-.flow-legend { display:flex; gap:18px; margin-bottom:20px; flex-wrap:wrap; }
-.fl-item { display:flex; align-items:center; gap:7px; font-size:12px; color:var(--slate); }
-.fl-dot { width:12px; height:12px; border-radius:3px; flex-shrink:0; }
-
-/* ── MATRIX ───────────────────────────────────── */
-.mtable { width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 16px rgba(0,0,0,0.09); }
-.mtable th { background:var(--teal); color:#fff; padding:12px 16px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:1px; text-align:left; }
-.mtable td { padding:12px 16px; font-size:12.5px; border-bottom:1px solid #E8E4DF; vertical-align:top; color:var(--slate); }
-.mtable tr:last-child td { border-bottom:none; }
-.mtable tbody tr:hover td { background:#FAFAF8; }
-.pdot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:7px; }
-.rx-full-c { font-weight:700; color:#276749; }
-.rx-del-c  { font-weight:600; color:#744210; }
-.rx-none-c { color:var(--light); }
-.cpa-chip { display:inline-block; padding:2px 9px; background:rgba(13,61,46,.1); color:var(--teal); border-radius:4px; font-size:11px; font-weight:700; letter-spacing:.5px; }
-
-/* ── SCROLL HINT ──────────────────────────────── */
-.scroll-hint {
-  display:none; text-align:center; font-size:11px; color:var(--muted);
-  padding:6px 0 0; letter-spacing:.5px;
-}
-
-/* ══════════════════════════════════════════════
-   MOBILE  (≤ 640px)
-══════════════════════════════════════════════ */
-@media (max-width: 640px) {
-
-  /* Header — stack logo above province toggle */
-  .hdr { flex-direction:column; align-items:stretch; gap:10px; padding:14px 16px; }
-  .prov-wrap { flex-direction:row; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; }
-  .prov-lbl { font-size:10px; }
-  .prov-toggle { flex:1; min-width:0; }
-  .prov-btn { flex:1; padding:8px 6px; font-size:11px; }
-
-  /* Tabs — scrollable strip, no line-break */
-  .tabs { padding:0 0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
-  .tabs::-webkit-scrollbar { display:none; }
-  .tab { padding:13px 18px; white-space:nowrap; font-size:11px; }
-
-  /* Main content */
-  .main { padding:12px 12px; }
-
-  /* Emergency banner — stack icon above text */
-  .emerg-banner { flex-direction:column; gap:6px; padding:12px 14px; }
-  .eb-icon { font-size:26px; }
-
-  /* Pillars grid → single column */
-  .pillars-grid { grid-template-columns:1fr; gap:0; }
-
-  /* Connectors — rotate to vertical arrows */
-  .connector {
-    flex-direction:row; padding:6px 20px;
-    justify-content:center; align-items:center; gap:20px;
-  }
-  .conn-up { flex-direction:row-reverse; gap:8px; }
-  .conn-dn { flex-direction:row; gap:8px; }
-  .conn-up .conn-lbl,
-  .conn-dn .conn-lbl { max-width:none; }
-  .conn-arr { display:inline-block; transform:rotate(90deg); font-size:22px !important; }
-
-  /* Detail panel — single column */
-  .d-hdr { padding:14px 16px; flex-wrap:wrap; gap:8px; }
-  .dh-r { width:100%; justify-content:space-between; }
-  .d-college { text-align:left; white-space:normal; }
-  .d-body { grid-template-columns:1fr; padding:14px 16px; gap:16px; }
-
-  /* Flow tab */
-  .flow-wrap { padding:14px 12px; }
-  .flow-legend { gap:10px; }
-  .scroll-hint { display:block; }
-
-  /* Regulatory Matrix — horizontal scroll */
-  #panel-matrix { overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px; }
-  .mtable { min-width:560px; border-radius:0; }
-}
-
-/* Medium screens (641–900px) — two-col detail panel */
-@media (min-width:641px) and (max-width:900px) {
-  .pillars-grid { grid-template-columns:1fr 40px 1fr 40px 1fr; }
-  .d-body { grid-template-columns:1fr 1fr; }
-  .main { padding:18px 20px; }
-}
-</style>
-</head>
-<body>
-
-<!-- HEADER -->
-<div class="hdr">
-  <div>
-    <div class="hdr-logo">True<em>Line</em></div>
-    <div class="hdr-sub">Clinical Triage Framework · Three-Pillar Model · Confidential 2026</div>
-  </div>
-  <div class="prov-wrap">
-    <div class="prov-lbl">Province View</div>
-    <div class="prov-toggle">
-      <button class="prov-btn on" id="pboth" onclick="setProvince('both')">Both</button>
-      <button class="prov-btn"   id="pnb"   onclick="setProvince('nb')">NB</button>
-      <button class="prov-btn"   id="pns"   onclick="setProvince('ns')">NS</button>
-    </div>
-  </div>
-</div>
-
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab on" id="t-pillars" onclick="setTab('pillars')">Three Pillars</div>
-  <div class="tab"   id="t-flow"    onclick="setTab('flow')">Patient Flow</div>
-  <div class="tab"   id="t-matrix"  onclick="setTab('matrix')">Regulatory Matrix</div>
-</div>
-
-<div class="main">
-
-<!-- ═══════════════════════ TAB 1: PILLARS ════════════════════════ -->
-<div class="panel on" id="panel-pillars">
-
-  <div class="emerg-banner">
-    <div class="eb-icon">⚡</div>
-    <div>
-      <div class="eb-title">Emergency — Call 911 or Proceed to Your Local ER</div>
-      <div class="eb-desc">Chest pain · Respiratory distress · Altered consciousness · Active hemorrhage · Hemodynamic instability · Any life-threatening presentation — call 911 immediately or proceed directly to your nearest Emergency Room. TrueLine clinical staff will assist with triage support while emergency services are contacted.</div>
-    </div>
-  </div>
-
-  <div class="entry-banner">
-    <div class="entry-title">↓ Patient Entry Point ↓</div>
-    <div class="entry-desc">All non-emergency patients enter via Pillar 1 · RPT completes intake → Pharmacist conducts clinical assessment</div>
-  </div>
-
-  <div class="pillars-grid">
-
-    <!-- PILLAR 1 -->
-    <div class="pillar">
-      <div class="pillar-hdr" style="background:var(--teal)">
-        <div class="pillar-num">Pillar 1 · Point of Entry</div>
-        <div class="pillar-title">Pharmacy Resources</div>
-        <div class="pillar-sub">First contact — resolves most employer health needs without escalation</div>
-        <div class="entry-pill">↓ Patient Entry</div>
-      </div>
-      <div class="pillar-body">
-        <div class="rcard" id="rc-pharmacist" onclick="selectRole('pharmacist')">
-          <div class="rcard-inner" style="background:#ECF5F0">
-            <div>
-              <div class="rcard-name" style="color:var(--teal)">Pharmacist</div>
-              <div class="rcard-tag" style="color:var(--teal-l)">Lead Clinician · Point of Access</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:rgba(200,137,42,.15);color:#7A5010">Rx Full</span>
-              <span class="badge" style="background:rgba(13,61,46,.12);color:var(--teal)">CPA</span>
-            </div>
-          </div>
-        </div>
-        <div class="rcard" id="rc-rpt" onclick="selectRole('rpt')">
-          <div class="rcard-inner" style="background:#F4FAF7">
-            <div>
-              <div class="rcard-name" style="color:var(--teal-l)">Pharmacy Technician (RPT)</div>
-              <div class="rcard-tag" style="color:var(--teal-l)">Clinical Support · Intake Specialist</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:#E2E8F0;color:var(--muted)">Support</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONNECTOR 1→2 -->
-    <div class="connector">
-      <div class="conn-up">
-        <div class="conn-lbl">Escalate</div>
-        <div class="conn-arr" style="color:var(--slate)">→</div>
-      </div>
-      <div class="conn-dn">
-        <div class="conn-arr" style="color:var(--light)">←</div>
-        <div class="conn-lbl" style="color:var(--light)">Step Down</div>
-      </div>
-    </div>
-
-    <!-- PILLAR 2 -->
-    <div class="pillar">
-      <div class="pillar-hdr" style="background:var(--teal-m)">
-        <div class="pillar-num">Pillar 2 · Escalation Pathway</div>
-        <div class="pillar-title">Nurses</div>
-        <div class="pillar-sub">Assessment, care planning, and autonomous NP-level practice</div>
-      </div>
-      <div class="pillar-body">
-        <div class="rcard" id="rc-lpn" onclick="selectRole('lpn')">
-          <div class="rcard-inner" style="background:#EEF7F3">
-            <div>
-              <div class="rcard-name" style="color:var(--teal-m)">Licensed Practical Nurse (LPN)</div>
-              <div class="rcard-tag" style="color:#2D7060">Clinical Assessment & Care Support</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:#DFF0E9;color:#2D7060">Clinical</span>
-            </div>
-          </div>
-        </div>
-        <div class="rcard" id="rc-rn" onclick="selectRole('rn')">
-          <div class="rcard-inner" style="background:#EEF7F3">
-            <div>
-              <div class="rcard-name" style="color:var(--teal-m)">Registered Nurse (RN)</div>
-              <div class="rcard-tag" style="color:#2D7060">Registered Nursing Care</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:#DFF0E9;color:#2D7060">Clinical</span>
-            </div>
-          </div>
-        </div>
-        <div class="rcard" id="rc-np" onclick="selectRole('np')">
-          <div class="rcard-inner" style="background:#E4F2EC">
-            <div>
-              <div class="rcard-name" style="color:var(--teal)">Nurse Practitioner (NP)</div>
-              <div class="rcard-tag" style="color:var(--teal-l)">Advanced Practice · Independent Prescriber</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:rgba(200,137,42,.15);color:#7A5010">Rx Full</span>
-              <span class="badge" style="background:rgba(13,61,46,.12);color:var(--teal)">CPA</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONNECTOR 2→3 -->
-    <div class="connector">
-      <div class="conn-up">
-        <div class="conn-lbl">Escalate</div>
-        <div class="conn-arr" style="color:var(--slate)">→</div>
-      </div>
-      <div class="conn-dn">
-        <div class="conn-arr" style="color:var(--light)">←</div>
-        <div class="conn-lbl" style="color:var(--light)">Step Down</div>
-      </div>
-    </div>
-
-    <!-- PILLAR 3 -->
-    <div class="pillar">
-      <div class="pillar-hdr" style="background:linear-gradient(135deg,#A0711C,#C8892A)">
-        <div class="pillar-num">Pillar 3 · Complex & Emergency Authority</div>
-        <div class="pillar-title">Physicians</div>
-        <div class="pillar-sub">Full medical authority · CPA authorization · Emergency backstop</div>
-      </div>
-      <div class="pillar-body">
-        <div class="rcard" id="rc-physician" onclick="selectRole('physician')">
-          <div class="rcard-inner" style="background:#FEF6E8">
-            <div>
-              <div class="rcard-name" style="color:#7A5010">ER Physician</div>
-              <div class="rcard-tag" style="color:#956818">Complex & Unstable Care · CPA Authorizing Partner</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:rgba(200,137,42,.18);color:#7A5010">Rx Full</span>
-              <span class="badge" style="background:rgba(13,61,46,.12);color:var(--teal)">CPA Auth</span>
-            </div>
-          </div>
-        </div>
-        <div class="rcard" id="rc-pa" onclick="selectRole('pa')">
-          <div class="rcard-inner" style="background:#FEF6E8">
-            <div>
-              <div class="rcard-name" style="color:#7A5010">Physician Assistant (PA)</div>
-              <div class="rcard-tag" style="color:#956818">Supervised Clinical Practice · CAPA Certified</div>
-            </div>
-            <div class="rcard-badges">
-              <span class="badge" style="background:#F2E4C8;color:#7A5010">Rx Delegated</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /pillars-grid -->
-
-  <!-- DETAIL PANEL -->
-  <div class="detail hide" id="detail">
-    <div class="d-hdr" id="d-hdr">
-      <div class="dh-l">
-        <h2 id="d-title">—</h2>
-        <p  id="d-tag">—</p>
-      </div>
-      <div class="dh-r">
-        <div class="d-college" id="d-college">—</div>
-        <button class="d-close" onclick="closeDetail()">✕</button>
-      </div>
-    </div>
-    <div class="d-body">
-      <div>
-        <div class="ds-title">Scope of Practice</div>
-        <ul class="scope-list" id="d-scope"></ul>
-      </div>
-      <div>
-        <div class="ds-title">Prescribing & Clinical Authority</div>
-        <div class="rx-box" id="d-rx"></div>
-        <div class="ds-title" style="margin-top:14px">CPA Role</div>
-        <div class="cpa-box" id="d-cpa"></div>
-      </div>
-      <div>
-        <div class="ds-title">Provincial Regulatory Notes</div>
-        <div class="pnote" id="d-nb-wrap">
-          <div class="pnote-lbl">New Brunswick</div>
-          <div class="pnote-txt" id="d-nb">—</div>
-        </div>
-        <div class="pnote" id="d-ns-wrap">
-          <div class="pnote-lbl">Nova Scotia</div>
-          <div class="pnote-txt" id="d-ns">—</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div><!-- /panel-pillars -->
-
-
-<!-- ═══════════════════════ TAB 2: FLOW ═══════════════════════════ -->
-<div class="panel" id="panel-flow">
-  <div class="flow-wrap">
-    <div class="flow-legend">
-      <div class="fl-item"><div class="fl-dot" style="background:#0D3D2E"></div>Pillar 1 — Pharmacy Resources</div>
-      <div class="fl-item"><div class="fl-dot" style="background:#155040"></div>Pillar 2 — Nurses</div>
-      <div class="fl-item"><div class="fl-dot" style="background:#C8892A"></div>Pillar 3 — Physicians</div>
-      <div class="fl-item"><div class="fl-dot" style="background:#9B2C2C"></div>Emergency — Call 911 / Local ER</div>
-      <div class="fl-item"><div class="fl-dot" style="background:#276749"></div>Resolution / Discharge</div>
-    </div>
-    <div class="scroll-hint">← Scroll to view full diagram →</div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
-      <svg id="flow-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 580" style="min-width:580px;width:100%;max-width:920px;display:block;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,sans-serif"></svg>
-    </div>
-  </div>
-</div>
-
-
-<!-- ═══════════════════════ TAB 3: MATRIX ════════════════════════ -->
-<div class="panel" id="panel-matrix">
-  <table class="mtable">
-    <thead>
-      <tr>
-        <th>Pillar</th>
-        <th>Role</th>
-        <th>NB College / Act</th>
-        <th>NS College / Act</th>
-        <th>Prescribing Authority</th>
-        <th>CPA Participation</th>
-      </tr>
-    </thead>
-    <tbody id="matrix-tbody"></tbody>
-  </table>
-</div>
-
-</div><!-- /main -->
-
-<div style="text-align:center;padding:18px 16px;font-size:11px;color:var(--muted);line-height:1.7">
-  TrueLine Health · Clinical Triage Framework · Confidential · 2026<br>
-  All clinicians registered under applicable provincial colleges · CPSNS/CPSNB · CRNNS/NANB · NSCP/NB Pharmacy Act
-</div>
-
-<script>
-/* ─── ROLE DATA ──────────────────────────────────────────────────── */
-const ROLES = {
-  pharmacist: {
-    pillar:1, color:'#0D3D2E',
-    title:'Pharmacist', tag:'Lead Clinician · Point of Access',
-    college:'NBCP — New Brunswick\nNSCP — Nova Scotia',
-    scope:[
-      'Minor ailment assessment & prescribing (20+ conditions)',
-      'Medication review & therapy management',
-      'CPA: lab ordering & chronic disease management',
-      'Prescription renewal, adaptation & therapeutic substitution',
-      'Drug interaction review & patient counselling',
-      'Care triage & clinical decision support'
-    ],
-    rx:'Full independent prescribing under provincial pharmacy acts. Extended scope via CPA for lab ordering and chronic disease management.',
-    rxClass:'rx-full',
-    cpa:'Lead CPA clinician — initiates and manages collaborative practice agreements with the authorizing physician. Responsible for CPA documentation, lab ordering, result follow-up, and chronic disease titration.',
-    nb:'Minor ailment prescribing under NB Pharmacy Act 2014 (Reg. 2014-72). CPA for chronic disease management and lab ordering under Regulation 21.7.',
-    ns:'Minor ailment prescribing (21 conditions) under Pharmacy Act (NS). CPA authority for lab ordering and expanded chronic disease scope under NSCP standards.'
-  },
-  rpt: {
-    pillar:1, color:'#1E6652',
-    title:'Pharmacy Technician (RPT)', tag:'Clinical Support · Intake Specialist',
-    college:'NBCP — New Brunswick\nNSCP — Nova Scotia',
-    scope:[
-      'Medication preparation, compounding & dispensing',
-      'Patient intake & health history documentation',
-      'Insurance verification & prior authorization',
-      'CPA documentation routing & pharmacist support',
-      'Medication reconciliation support',
-      'Appointment scheduling & follow-up coordination'
-    ],
-    rx:'No prescribing authority. All clinical work conducted under direct pharmacist supervision. Cannot assess, triage, or prescribe independently.',
-    rxClass:'rx-none',
-    cpa:'CPA Support role — routes documents, organizes lab requisitions, and supports the pharmacist in CPA-related administrative and logistical tasks. Cannot authorize or initiate a CPA independently.',
-    nb:'Regulated under NBCP. Expanding scope in community primary care clinic settings. All clinical decisions remain with the supervising pharmacist.',
-    ns:'Regulated under NSCP. RPT integration growing in primary care pharmacies. Limited strictly to technical and support functions under pharmacist direction.'
-  },
-  lpn: {
-    pillar:2, color:'#155040',
-    title:'Licensed Practical Nurse (LPN)', tag:'Clinical Assessment & Care Support',
-    college:'CLPNNB — New Brunswick\nCLPNNS — Nova Scotia',
-    scope:[
-      'Vital signs, intake & structured patient assessment',
-      'Wound care, dressing changes & skin assessments',
-      'Specimen collection & point-of-care diagnostic testing',
-      'Medication administration under delegation',
-      'Care plan implementation under RN or NP direction',
-      'Patient education & discharge preparation'
-    ],
-    rx:'No prescribing authority. Administers medications under delegated orders from RN, NP, or Physician only.',
-    rxClass:'rx-none',
-    cpa:'No direct CPA role. Supports CPA-related care delivery (collecting vitals and monitoring data for chronic disease protocols) under pharmacist or NP direction.',
-    nb:'Regulated under CLPNNB. Scope expanding in community and primary care settings under NB Nursing Act and community care regulations.',
-    ns:'Regulated under CLPNNS. Full clinical assessment scope in primary care clinics. Scope differs from RN — LPN works within established care plans rather than developing them autonomously.'
-  },
-  rn: {
-    pillar:2, color:'#155040',
-    title:'Registered Nurse (RN)', tag:'Registered Nursing Care',
-    college:'NANB — New Brunswick\nCRNNS — Nova Scotia',
-    scope:[
-      'Comprehensive, autonomous nursing assessment',
-      'Chronic disease monitoring & care plan development',
-      'Complex wound & post-operative care management',
-      'Specialist referral coordination',
-      'Mental health intake, risk assessment & triage',
-      'RN-initiated interventions within independent nursing scope'
-    ],
-    rx:'No independent prescribing. Manages delegated orders and initiates RN-autonomous interventions within regulated nursing scope.',
-    rxClass:'rx-none',
-    cpa:'CPA Support role — carries out CPA-related monitoring (vital signs, point-of-care testing, bloodwork collection) as delegated within the pharmacist\'s CPA framework.',
-    nb:'Regulated under NANB. Broad autonomous scope for nursing assessment and independent nursing diagnosis. Operates under NANB Standards of Practice.',
-    ns:'Regulated under CRNNS. Clinical leadership role in primary care teams. Full nursing assessment and care planning authority.'
-  },
-  np: {
-    pillar:2, color:'#155040',
-    title:'Nurse Practitioner (NP)', tag:'Advanced Practice · Independent Prescriber',
-    college:'NANB / CNNB — New Brunswick\nCRNNS — Nova Scotia',
-    scope:[
-      'Full physical examination & diagnostic workup',
-      'Independent prescribing (full formulary access)',
-      'Chronic disease diagnosis, management & titration',
-      'Mental health assessment, diagnosis & prescribing',
-      'Independent specialist referral authority',
-      'Acute & emergency care within NP competency'
-    ],
-    rx:'Full independent prescribing authority — equivalent to physician for most primary and community care presentations. Autonomous diagnosis and treatment under provincial NP legislation.',
-    rxClass:'rx-full',
-    cpa:'CPA Authorizing Partner — NPs with full prescriptive authority can authorize and co-sign Collaborative Practice Agreements alongside or in place of a physician, enabling pharmacists to order labs and manage chronic disease under CPA protocols. NP-authorized CPAs function equivalently to physician-authorized CPAs within the NP\'s scope of practice.',
-    nb:'Regulated under NANB; NP prescriptive authority under NB Nurse Practitioner Act. Full diagnostic and prescribing scope. NP CPA authorization valid within NP scope of practice.',
-    ns:'Regulated under CRNNS; expanded NP formulary and diagnostic authority. NPs in NS can authorize CPAs for pharmacists within their scope — particularly for chronic disease management and lab ordering protocols.'
-  },
-  physician: {
-    pillar:3, color:'#C8892A',
-    title:'ER Physician', tag:'Complex & Unstable Care · CPA Authorizing Partner',
-    college:'CPSNB — New Brunswick\nCPSNS — Nova Scotia',
-    scope:[
-      'Complex, multi-system & high-acuity presentation management',
-      'Emergency & hemodynamically unstable case authority',
-      'Procedural oversight & major clinical decisions',
-      'Specialist bridge admissions & referral coordination',
-      'CPA authorization & co-signature (pharmacist CPA partner)',
-      'Liability backstop for all escalated cases across all pillars'
-    ],
-    rx:'Full unrestricted prescribing authority across all drug classes. No formulary or scope limitations.',
-    rxClass:'rx-full',
-    cpa:'CPA Authorizing Physician — co-signs and supervises pharmacist CPAs for lab ordering and chronic disease management under Regulation 21.7 (NB) and NSCP standards. Reviews CPA cases, authorizes expanded pharmacist scope, and maintains final clinical oversight.',
-    nb:'Regulated under CPSNB. Acts as CPA authorizing physician under NB Pharmacy Regulation 21.7. Full emergency and complex clinical authority across all presentations.',
-    ns:'Regulated under CPSNS. CPA authorizing role under NSCP standards. Primary clinical backstop for complex cases and all emergency escalations.'
-  },
-  pa: {
-    pillar:3, color:'#C8892A',
-    title:'Physician Assistant (PA)', tag:'Supervised Clinical Practice · CAPA Certified',
-    college:'CPSNB (via supervising MD) — NB\nCPSNS (via supervising MD) — NS',
-    scope:[
-      'Clinical assessment under supervising physician delegation',
-      'Prescribing within supervising physician\'s delegated formulary',
-      'Diagnostic orders: labs, imaging & point-of-care testing',
-      'Lower-complexity physician-tier case management',
-      'Detailed clinical documentation & patient history',
-      'Emergency clinical support alongside ER Physician'
-    ],
-    rx:'Delegated prescribing only — prescribes within the formulary and scope authorized by the supervising ER Physician. Cannot prescribe independently or beyond delegated authority.',
-    rxClass:'rx-del',
-    cpa:'No direct CPA role. Cannot serve as CPA-authorizing physician. May assist with CPA-related case management under physician supervision, but the supervising physician remains the sole CPA authority.',
-    nb:'No independent PA regulation in NB; PA practice is enabled through supervising physician registration under CPSNB. Full scope governed by supervising physician\'s delegation agreement.',
-    ns:'No independent PA regulation in NS; PA practice enabled through CPSNS supervising physician. CAPA (Canadian Association of PAs) certification governs national competency standards.'
-  }
-};
-
-const MATRIX = [
-  { p:1, col:'#0D3D2E', role:'Pharmacist',              nb:'NBCP · NB Pharmacy Act 2014',           ns:'NSCP · Pharmacy Act (NS)',                rx:'Full Independent',     rxc:'rx-full-c', cpa:true  },
-  { p:1, col:'#1E6652', role:'Pharmacy Technician (RPT)',nb:'NBCP · NB Pharmacy Act 2014',           ns:'NSCP · Pharmacy Act (NS)',                rx:'None',                 rxc:'rx-none-c', cpa:false },
-  { p:2, col:'#155040', role:'LPN',                      nb:'CLPNNB · NB Licensed Practical Nurses Act', ns:'CLPNNS · NS LPN Act',               rx:'None (delegated admin)',rxc:'rx-none-c', cpa:false },
-  { p:2, col:'#155040', role:'Registered Nurse (RN)',    nb:'NANB · NB Nurses Act',                  ns:'CRNNS · NS Registered Nurses Act',        rx:'None (RN scope)',      rxc:'rx-none-c', cpa:false },
-  { p:2, col:'#155040', role:'Nurse Practitioner (NP)',  nb:'NANB/CNNB · NB NP Act',                 ns:'CRNNS · NS NP Regulations',               rx:'Full Independent',     rxc:'rx-full-c', cpa:true  },
-  { p:3, col:'#C8892A', role:'ER Physician',             nb:'CPSNB · NB Medical Act',                ns:'CPSNS · NS Medical Act',                  rx:'Full Unrestricted',    rxc:'rx-full-c', cpa:true  },
-  { p:3, col:'#C8892A', role:'Physician Assistant (PA)', nb:'CPSNB (via supervising MD)',             ns:'CPSNS (via supervising MD)',               rx:'Delegated only',       rxc:'rx-del-c',  cpa:false },
-];
-
-/* ─── STATE ─────────────────────────────────────────────────────── */
-let activeRole = null;
-let activeProvince = 'both';
-let flowBuilt = false;
-let matrixBuilt = false;
-
-/* ─── TABS ──────────────────────────────────────────────────────── */
-function setTab(t) {
-  ['pillars','flow','matrix'].forEach(id => {
-    document.getElementById('panel-'+id).classList.toggle('on', id===t);
-    document.getElementById('t-'+id).classList.toggle('on', id===t);
-  });
-  if (t==='flow'   && !flowBuilt)   { buildFlow();   flowBuilt   = true; }
-  if (t==='matrix' && !matrixBuilt) { buildMatrix(); matrixBuilt = true; }
-}
-
-/* ─── PROVINCE ───────────────────────────────────────────────────── */
-function setProvince(p) {
-  activeProvince = p;
-  ['both','nb','ns'].forEach(id => document.getElementById('p'+id).classList.toggle('on', id===p));
-  if (activeRole) renderDetail(activeRole);
-}
-
-/* ─── ROLE SELECT ────────────────────────────────────────────────── */
-function selectRole(id) {
-  if (activeRole === id) { closeDetail(); return; }
-  if (activeRole) document.getElementById('rc-'+activeRole)?.classList.remove('sel');
-  activeRole = id;
-  document.getElementById('rc-'+id)?.classList.add('sel');
-  renderDetail(id);
-}
-
-function closeDetail() {
-  if (activeRole) document.getElementById('rc-'+activeRole)?.classList.remove('sel');
-  activeRole = null;
-  document.getElementById('detail').classList.add('hide');
-}
-
-function renderDetail(id) {
-  const r = ROLES[id];
-  document.getElementById('d-hdr').style.background = r.color;
-  document.getElementById('d-title').textContent   = r.title;
-  document.getElementById('d-tag').textContent     = r.tag;
-  document.getElementById('d-college').textContent = r.college;
-  document.getElementById('d-scope').innerHTML     = r.scope.map(s=>`<li>${s}</li>`).join('');
-  const rxEl = document.getElementById('d-rx');
-  rxEl.textContent = r.rx;
-  rxEl.className = 'rx-box ' + r.rxClass;
-  document.getElementById('d-cpa').textContent = r.cpa;
-  document.getElementById('d-nb').textContent  = r.nb;
-  document.getElementById('d-ns').textContent  = r.ns;
-  document.getElementById('d-nb-wrap').style.display = (activeProvince==='ns') ? 'none' : '';
-  document.getElementById('d-ns-wrap').style.display = (activeProvince==='nb') ? 'none' : '';
-  const panel = document.getElementById('detail');
-  panel.classList.remove('hide');
-  setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'nearest' }), 60);
-}
-
-/* ─── MATRIX ────────────────────────────────────────────────────── */
-function buildMatrix() {
-  document.getElementById('matrix-tbody').innerHTML = MATRIX.map(r => `
-    <tr>
-      <td style="font-weight:700;white-space:nowrap"><span class="pdot" style="background:${r.col}"></span>Pillar ${r.p}</td>
-      <td style="font-weight:700;color:${r.col}">${r.role}</td>
-      <td>${r.nb}</td>
-      <td>${r.ns}</td>
-      <td class="${r.rxc}">${r.rx}</td>
-      <td>${r.cpa ? '<span class="cpa-chip">CPA</span>' : '<span style="color:var(--light);font-size:11px">—</span>'}</td>
-    </tr>`).join('');
-}
-
-/* ─── PATIENT FLOW SVG ───────────────────────────────────────────── */
-function buildFlow() {
-  const svg = document.getElementById('flow-svg');
-  const T   = '#0D3D2E';
-  const TM  = '#155040';
-  const G   = '#C8892A';
-  const R   = '#9B2C2C';
-  const GR  = '#276749';
-  const SL  = '#4A5568';
-  const W   = '#FFFFFF';
-
-  /* helpers */
-  function rect(x,y,w,h,fill,rx=8,opacity=1) {
-    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${fill}" opacity="${opacity}"/>`;
-  }
-  function txt(x,y,t,fill=W,sz=12,fw=700,anchor='middle',dy=0) {
-    return `<text x="${x}" y="${y+dy}" text-anchor="${anchor}" dominant-baseline="middle" font-size="${sz}" font-weight="${fw}" fill="${fill}">${t}</text>`;
-  }
-  function box2(x,y,w,h,fill,line1,line2='',tcolor=W) {
-    const midY = line2 ? y+h/2-8 : y+h/2;
-    let s = rect(x,y,w,h,fill);
-    s += txt(x+w/2, midY, line1, tcolor, 12, 700, 'middle');
-    if (line2) s += txt(x+w/2, midY+16, line2, tcolor, 10, 400, 'middle');
-    return s;
-  }
-  function diamond(x,y,w,h,fill,label,tcolor=W) {
-    const cx=x+w/2, cy=y+h/2;
-    return `<polygon points="${cx},${y} ${x+w},${cy} ${cx},${y+h} ${x},${cy}" fill="${fill}"/>` +
-           txt(cx, cy, label, tcolor, 11, 700);
-  }
-  function line(x1,y1,x2,y2,color,dash='',w=2) {
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}" marker-end="url(#ah-${color.replace('#','')})"/>`;
-  }
-  function curve(d,color,dash='',w=2) {
-    return `<path d="${d}" fill="none" stroke="${color}" stroke-width="${w}" stroke-dasharray="${dash}" marker-end="url(#ah-${color.replace('#','')})"/>`;
-  }
-  function smallLbl(x,y,t,color=SL) {
-    return txt(x,y,t,color,9,700,'middle');
-  }
-
-  /* arrowhead markers */
-  const markers = [T,TM,G,R,GR,SL].map(c =>
-    `<marker id="ah-${c.replace('#','')}" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth">
-      <path d="M0,0 L8,4 L0,8 Z" fill="${c}"/>
-    </marker>`).join('');
-
-  let s = `<defs>${markers}</defs>`;
-
-  /* background */
-  s += rect(0,0,920,580,'#F0EDE8',12);
-
-  /* ── SWIMLANE BANDS ── */
-  /* band labels on far left edge */
-  s += rect(30,100,860,150,T,8,0.06);
-  s += rect(32,108,22,134,T,6,0.5);
-  s += `<text x="43" y="175" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="800" fill="#fff" letter-spacing="1" transform="rotate(-90,43,175)">PILLAR 1 · PHARMACY</text>`;
-
-  s += rect(30,265,860,140,TM,8,0.06);
-  s += rect(32,273,22,124,TM,6,0.5);
-  s += `<text x="43" y="335" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="800" fill="#fff" letter-spacing="1" transform="rotate(-90,43,335)">PILLAR 2 · NURSES</text>`;
-
-  s += rect(30,420,860,135,G,8,0.06);
-  s += rect(32,428,22,119,G,6,0.5);
-  s += `<text x="43" y="487" text-anchor="middle" dominant-baseline="middle" font-size="9" font-weight="800" fill="#fff" letter-spacing="1" transform="rotate(-90,43,487)">PILLAR 3 · PHYSICIANS</text>`;
-
-  /* ── PATIENT ENTRY ── */
-  s += box2(340,20,240,42,T,'PATIENT ARRIVAL','Non-emergency triage entry');
-  s += line(460,62,460,100,SL,'',1.5);
-
-  /* ── EMERGENCY BYPASS (right side curved arrow) ── */
-  s += rect(655,14,240,52,R,8);
-  s += txt(775,30,'⚡  CALL 911 OR GO TO YOUR ER',W,10.5,700);
-  s += txt(775,47,'Life-threatening presentation — bypass TrueLine triage',W,9,400);
-  /* curved bypass line from emergency banner down right side */
-  s += curve(`M 785 66 Q 845 250 785 420`, R, '6,4', 2);
-  s += smallLbl(850, 250, '911 / ER', R);
-
-  /* ── PILLAR 1 BAND ── */
-  /* RPT intake */
-  s += box2(62,108,185,44,T,'RPT Intake','Health history · Admin');
-  s += line(247,130,310,130,T,'',1.5);
-
-  /* Pharmacist assessment */
-  s += box2(310,108,235,44,T,'Pharmacist Assessment','Minor ailments · Medication · CPA');
-
-  /* Decision diamond */
-  s += line(430,152,430,175,T,'',1.5);
-  s += diamond(370,175,120,50,T,'Resolved?');
-  s += smallLbl(452,199,'YES',W);
-  s += line(490,200,560,200,T,'',1.5);
-  s += box2(560,180,120,40,GR,'✓ Resolved',''  ,W);
-
-  /* NO → escalate down */
-  s += line(430,225,430,265,TM,'',1.5);
-  s += smallLbl(450,248,'NO — Escalate',TM);
-
-  /* ── PILLAR 2 BAND ── */
-  /* LPN/RN */
-  s += box2(62,275,200,44,TM,'LPN / RN Assessment','Vitals · Nursing care plan');
-  s += line(262,297,330,297,TM,'',1.5);
-
-  /* NP */
-  s += box2(335,275,230,44,TM,'Nurse Practitioner (NP)','Diagnosis · Full prescribing');
-
-  /* Decision */
-  s += line(450,319,450,340,TM,'',1.5);
-  s += diamond(390,340,120,50,TM,'Resolved?');
-  s += smallLbl(452,365,'YES',W);
-  s += line(510,365,560,365,TM,'',1.5);
-  s += box2(560,345,120,40,GR,'✓ Resolved','',W);
-
-  /* NO → escalate */
-  s += line(450,390,450,420,G,'',1.5);
-  s += smallLbl(470,407,'NO — Escalate',G);
-
-  /* ── PILLAR 3 BAND ── */
-  /* PA */
-  s += box2(62,430,185,44,G,'Physician Assistant (PA)','Delegated assessment & orders');
-  s += line(247,452,310,452,G,'',1.5);
-
-  /* ER Physician */
-  s += box2(315,430,240,44,G,'ER Physician','Complex · Emergency · CPA Auth');
-
-  /* Outcomes */
-  s += line(555,452,605,452,G,'',1.5);
-  s += diamond(605,432,130,40,G,'Outcome?');
-
-  s += line(735,452,785,452,G,'',1.5);
-  s += box2(785,432,100,40,GR,'✓ Managed','',W);
-
-  s += line(670,472,670,510,G,'',1.5);
-  s += smallLbl(690,492,'REFER',G);
-  s += box2(620,512,100,36,G,'Specialist Ref.',''  ,W);
-
-  s += line(635,472,585,490,G,'4,3',1.5);
-  s += smallLbl(600,475,'ADMIT',G);
-  s += box2(535,490,100,36,R,'Hospitalize','',W);
-
-  /* band labels already rendered as rotated text strips on left */
-
-  svg.innerHTML = s;
-}
-</script>
-</body>
-</html>
+# TrueLine Health — Clinical Triage Framework
+### Interactive Three-Pillar Model Overview
+
+> **Confidential — Internal Use Only**
+> TrueLine Health Systems · 2026
+
+---
+
+## Overview
+
+This repository contains the interactive clinical triage reference guide for TrueLine's **Three-Pillar Clinical Model** — the structured framework governing how patients are assessed, routed, and managed across TrueLine's integrated employer health teams in New Brunswick and Nova Scotia.
+
+Open `TrueLine_Triage_Overview.html` in any modern browser. No server, build step, or dependencies required — it is fully self-contained.
+
+**Live preview:** [TrueLine Triage Overview](https://htmlpreview.github.io/?https://github.com/lukeles37/trueline-triage-overview/blob/main/TrueLine_Triage_Overview.html)
+
+---
+
+## The Three-Pillar Model
+
+| Pillar | Roles | Access | Function |
+|--------|-------|--------|----------|
+| **Pillar 1 — Primary Care Intake** | Pharmacist · RPT · LPN | 24–36 hrs · In-person | Patient entry point. Pharmacist leads clinical assessment and prescribing. RPT delivers injection services, technical Rx counselling, and medication preparation. LPN conducts structured intake — vitals, health history, and initial assessment — under pharmacist supervision. |
+| **Pillar 2 — Resolutions and Referrals** | LPN (continuing) · NP · PA | 48–72 hrs · Virtual/Phone/In-person | Escalation pathway for cases exceeding Pillar 1 scope. LPN continues in clinical support under NP supervision. NP provides autonomous diagnosis, full prescribing authority, and serves as CPA Authorizing Partner. PA assesses, resolves, and refers within PA delegated scope — and spans into Pillar 3 for complex cases. |
+| **Pillar 3 — Advanced and Emergency Care** | ER Physician · PA (continuing) | Initiated <24 hrs · Appt 3–5 business days | Complex, unstable, and high-acuity cases. ER Physician holds full CPA authorization authority. PA continues from Pillar 2 under ER Physician supervision for cases requiring delegated advanced clinical management. |
+
+**Emergency presentations** (chest pain, respiratory distress, altered consciousness, active hemorrhage, hemodynamic instability) bypass all pillars — **call 911 or proceed to the nearest ER immediately.**
+
+---
+
+## Dual-Pillar Roles
+
+Two roles span adjacent pillars — mirroring how clinical acuity flows naturally rather than resetting at each handoff:
+
+- **LPN** — Structured intake in Pillar 1 (vitals, health history, assessment under pharmacist supervision) → continuing clinical support in Pillar 2 (under NP supervision)
+- **PA** — Assessment, resolution, and referral in Pillar 2 (within PA delegated scope) → complex case management in Pillar 3 (under ER Physician supervision)
+
+---
+
+## Interactive Features
+
+The guide includes three tabs:
+
+### Three Pillars
+- Visual display of all three pillars and their constituent roles
+- Click any role card to expand a full detail panel showing:
+  - Scope of practice
+  - Prescribing and clinical authority
+  - CPA role (where applicable)
+  - Province-specific regulatory notes (NB / NS)
+- **Province toggle** (Both / NB / NS) filters regulatory notes in real time
+- Dual-pillar roles (LPN, PA) display cards in both pillars with a "Spans" badge
+
+### Patient Flow
+- SVG swimlane diagram showing the full triage decision path
+- Covers: patient arrival → emergency check → RPT + LPN intake → Pharmacist assessment → PA/NP escalation → ER Physician → resolution outcomes
+- Emergency 911/ER bypass clearly indicated
+
+### Regulatory Matrix
+- Full comparison table for all 7 roles
+- Columns: Pillar · Role · NB College/Act · NS College/Act · Prescribing Authority · CPA Participation
+
+---
+
+## Regulatory Scope Summary
+
+All TrueLine clinicians are registered under applicable provincial colleges. Services are delivered outside the CHA's insured basket and are legally equivalent to dental coverage under employer group benefits plans.
+
+| Role | NB Regulator | NS Regulator | Prescribing | CPA |
+|------|-------------|-------------|-------------|-----|
+| Pharmacist | NBCP | NSCP | Full independent | Authorizing party |
+| RPT | NBCP | NSCP | None | Clinical-technical support |
+| LPN | CLPNNB | CLPNNS | None | No |
+| NP | NANB/CNNB | CRNNS | Full independent | Authorizing partner |
+| PA | CPSNB (via MD) | CPSNS (via MD) | Delegated only | No |
+| ER Physician | CPSNB | CPSNS | Full unrestricted | Authorizing party |
+
+---
+
+## Related Documents
+
+| Document | Description |
+|----------|-------------|
+| `TrueLine_Triage_System_v2.docx` | Full clinical triage SOP — CPA and non-CPA workflows, condition-specific routing tables, escalation criteria for all three pillars |
+| `TrueLine_Roles_and_Responsibilities_v2.docx` | Detailed scope of practice, responsibilities, and escalation criteria for all 6 roles across all three pillars |
+| `TrueLine-EmployerPitchDeck-2026.pptx` | Employer-facing pitch deck — market context, legal framework, clinical model, ROI case |
+| `TrueLine-PolicyBrief-EmployerSupplementary-2026.docx` | Supplementary policy brief for employer partners |
+| `TrueLine-PrescribingPartner-Brief.docx` | NP/PA prescribing partnership brief |
+| `TrueLine-Letter-NBPA-HeidiListon-EmployerTrack-March2026.docx` | NBPA employer track letter |
+
+---
+
+## Policy Context
+
+- **CHA Services Policy (April 2026):** NPs, pharmacists, and midwives providing physician-equivalent services must be covered by public insurance — directly validating TrueLine's clinical staffing model.
+- **OurCare National Survey 2025 (Kiran et al.):** 5.8 million Canadian adults lack access to a primary care provider. Atlantic provinces and Quebec rank worst nationally.
+- **NS Budget 2026–27 / NB Budget 2026–27:** Both provinces fund pharmacist-led community care models — TrueLine delivers the same model through employer benefits, available today.
+
+---
+
+## Usage Notes
+
+- Designed for internal clinical staff, operations, and leadership reference
+- Not intended for patient-facing distribution
+- Regulatory information reflects NB and NS legislation as of March 2026 — verify against current college standards before clinical use
+- For questions about scope of practice or CPA protocols, contact the TrueLine Clinical Lead
+
+---
+
+*TrueLine Health Systems · Confidential · 2026*
